@@ -1,0 +1,1 @@
+python -u %~dp0main.py
