@@ -1,5 +1,7 @@
 ﻿#!/usr/bin/python -u
 import sys, os
+import serial, time
+
 sys.path.insert(0, os.getcwd() + '\\ui')
 sys.path.insert(0, os.getcwd() + '\\control')
 
