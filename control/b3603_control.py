@@ -62,6 +62,10 @@ class Control:
             if debug:
                 self.print_ack(ack)
         if ack:
+            for a in ack:
+                if ('E!' in a):
+                    self.__iprint('B3603 Cmd: Error')
+                    return 0
             self.__iprint('B3603 Cmd: OK' )
         else:
             self.__iprint('B3603 Cmd: Error')

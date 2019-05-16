@@ -34,13 +34,14 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
 
     def set_on(self):
         v = self.leVoltage.text()
-        print(v)
+
         cmdr = Control('COM9')  # /dev/ttyUSB0 for Linux
         if cmdr.get_status() == 0:
             return close_connect(cmdr)
-        cmdr.send_cmd("OUTPUT 0")
+
+        print('Voltage: ' + v)
         cmdr.send_cmd("VOLTAGE " + v)
-        cmdr.send_cmd("CURRENT 800")
+        cmdr.send_cmd("CURRENT 400")
         cmdr.send_cmd("OUTPUT 1")
         close_connect(cmdr)
 
