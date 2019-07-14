@@ -23,16 +23,19 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         self.setupUi(self)  # Init design
 
         try:
-            offset = 0
+            config = ""
             with open("config.json", "r") as config_file:
                 config = json.load(config_file)
             print("Config found...")
-            self.leVoltage.setText(str(config['voltage']))
-            self.leVoltageOfst.setText(str(config['voltage offset']))
         except:
             print("Config not found")
-            update_config(0)
+            self.update_config(5000, 0)
+            with open("config.json", "r") as config_file:
+                config = json.load(config_file)            
 
+        self.leVoltage.setText(str(config['voltage']))
+        self.leVoltageOfst.setText(str(config['voltage offset']))
+        
         # Slot connecting
         self.pbOff.clicked.connect(self.set_off)
         self.pbSet.clicked.connect(self.set_on)
