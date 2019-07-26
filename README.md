@@ -1,2 +1,2 @@
 # B3603ControlQt
-GUI for B3603 control
+GUI for the B3603 power supply
