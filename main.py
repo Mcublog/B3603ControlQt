@@ -4,7 +4,7 @@ import serial, time
 import json
 
 sys.path.insert(0, os.getcwd() + '\\ui')
-sys.path.insert(0, os.getcwd() + '\\control')
+sys.path.insert(0, os.getcwd() + '\\ControlB3603')
 
 from PyQt5 import QtWidgets
 
