@@ -18,6 +18,9 @@
     <normaloff>:/img/flash.png</normaloff>:/img/flash.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <property name="spacing">
      <number>10</number>
@@ -51,7 +54,7 @@
       <item>
        <widget class="QGroupBox" name="gbControl">
         <property name="title">
-         <string>Contol</string>
+         <string>Conrtol</string>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
@@ -101,7 +104,7 @@
          </sizepolicy>
         </property>
         <property name="title">
-         <string>Offsets</string>
+         <string>Offset</string>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
@@ -180,6 +183,16 @@
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>349</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="res/res.qrc"/>

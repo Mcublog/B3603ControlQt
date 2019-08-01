@@ -17,6 +17,7 @@ class Ui_MainWindow(object):
         icon.addPixmap(QtGui.QPixmap(":/img/flash.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setEnabled(False)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setContentsMargins(10, 10, 10, 0)
@@ -95,6 +96,10 @@ class Ui_MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        self.menuBar = QtWidgets.QMenuBar(MainWindow)
+        self.menuBar.setGeometry(QtCore.QRect(0, 0, 349, 21))
+        self.menuBar.setObjectName("menuBar")
+        MainWindow.setMenuBar(self.menuBar)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -102,11 +107,11 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "B3603"))
-        self.gbControl.setTitle(_translate("MainWindow", "Contol"))
+        self.gbControl.setTitle(_translate("MainWindow", "Conrtol"))
         self.leVoltage.setInputMask(_translate("MainWindow", "99999"))
         self.label.setText(_translate("MainWindow", "mV"))
         self.leMinus.setText(_translate("MainWindow", "-"))
-        self.gbOptions.setTitle(_translate("MainWindow", "Offsets"))
+        self.gbOptions.setTitle(_translate("MainWindow", "Offset"))
         self.leVoltageOfst.setInputMask(_translate("MainWindow", "99999"))
         self.lbVoltageCap.setText(_translate("MainWindow", "mV"))
         self.groupBox.setTitle(_translate("MainWindow", "Control"))
