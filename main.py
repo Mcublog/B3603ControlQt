@@ -63,6 +63,7 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         print(self.__cmdr.get_status())
         if self.__cmdr.get_status() == False:
             self.__cmdr.close_connect()
+            self.centralWidget().setEnabled(False)
         else:        
             self.centralWidget().setEnabled(True)
 
