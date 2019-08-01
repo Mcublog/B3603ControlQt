@@ -54,7 +54,7 @@
       <item>
        <widget class="QGroupBox" name="gbControl">
         <property name="title">
-         <string>Conrtol</string>
+         <string>Voltage</string>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>

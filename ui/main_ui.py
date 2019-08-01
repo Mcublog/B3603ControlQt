@@ -107,7 +107,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "B3603"))
-        self.gbControl.setTitle(_translate("MainWindow", "Conrtol"))
+        self.gbControl.setTitle(_translate("MainWindow", "Voltage"))
         self.leVoltage.setInputMask(_translate("MainWindow", "99999"))
         self.label.setText(_translate("MainWindow", "mV"))
         self.leMinus.setText(_translate("MainWindow", "-"))
