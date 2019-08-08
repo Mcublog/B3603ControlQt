@@ -3,6 +3,7 @@ import sys, os
 import serial, time
 from serial.tools import list_ports
 import json
+import threading
 
 sys.path.insert(0, os.getcwd() + '\\ui')
 sys.path.insert(0, os.getcwd() + '\\ControlB3603')
@@ -14,29 +15,36 @@ import main_ui
 
 from b3603_control import Control
 
+
 def close_connect(cmdr):
     del cmdr      
 
 
 class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
 
+
+
     def __init__(self):
         super().__init__()
         self.setupUi(self)  # Init design
+        self.lock = threading.Lock()
 
         self.__cmdr = Control('COM1') # Init B3603 control class
         if self.__cmdr .get_status() != 0: # If the connection is sucsessfully
             self.__cmdr.close_connect()
 
         menubar = self.menuBar 
-        connMenu = menubar.addMenu('&Connection') # Add menu to menu bar 
+        self.connMenu = menubar.addMenu('&Connection') # Add menu to menu bar
+
+        t = threading.Thread(target=self.port_scan)
+        t.start()
         
-        ports = list(list_ports.comports()) # return ListPortInfo
-        for port in ports:
-            extractAction = QAction(port.device, self)
-            extractAction.triggered.connect(self.on_connect_clicked)
-            connMenu.addAction(extractAction)
-            print(port.device)
+        # ports = list(list_ports.comports()) # return ListPortInfo
+        # for port in ports:
+        #     extractAction = QAction(port.device, self)
+        #     extractAction.triggered.connect(self.on_connect_clicked)
+        #     self.connMenu.addAction(extractAction)
+        #     print(port.device)
 
         try:
             config = ""
@@ -56,46 +64,117 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         self.pbOff.clicked.connect(self.set_off)
         self.pbSet.clicked.connect(self.set_on)
 
+    def dispay_disable(self):
+        self.lock.acquire()
+        try:
+            self.__cmdr.close_connect()
+        finally:
+            self.lock.release()    
+        self.centralWidget().setEnabled(False)        
+
+    def port_scan(self):
+        ports = []
+        last_posts = []
+        while True:
+            ports = list(list_ports.comports()) # return ListPortInfo
+            if (ports != last_posts):
+                self.connMenu.clear()
+                for port in ports:
+                    extractAction = QAction(port.device, self)
+                    extractAction.triggered.connect(self.on_connect_clicked)
+                    self.connMenu.addAction(extractAction)
+                    print(port.device)
+                status = 0
+                self.lock.acquire()
+                try:
+                    status = self.__cmdr.get_status()
+                finally:
+                    self.lock.release()
+                if (status == 1):                    
+                    port = ''
+                    self.lock.acquire()
+                    try:
+                        port = self.__cmdr.get_port()
+                    finally:
+                        self.lock.release()
+                    ports_num = []
+                    for dev in ports:
+                        ports_num.append(dev.device)
+                    if not (port in ports_num):
+                        self.dispay_disable()
+            last_posts = ports    
+            time.sleep(0.5)    
+
     def on_connect_clicked(self):
         action = self.sender()
         print('Action: ' + action.text())
-        self.__cmdr = Control(action.text())  # /dev/ttyUSB0 for Linux
-        print(self.__cmdr.get_status())
-        if self.__cmdr.get_status() == False:
-            self.__cmdr.close_connect()
-            self.centralWidget().setEnabled(False)
+        self.lock.acquire()
+        try:
+            if (self.__cmdr != None):
+                del self.__cmdr
+            self.__cmdr = Control(action.text())  # /dev/ttyUSB0 for Linux
+        finally:
+            self.lock.release()   
+        # print(self.__cmdr.get_status())
+        status = 0
+        self.lock.acquire()
+        try:
+            status = self.__cmdr.get_status()
+        finally:
+            self.lock.release()            
+        
+        if (status == 0):
+            self.dispay_disable()
         else:        
             self.centralWidget().setEnabled(True)
 
     def set_off(self):
-        self.leVoltage.setText('0')
-        self.__cmdr.send_cmd("OUTPUT 0")    
-        # close_connect(cmdr)
+        status = 0
+        self.lock.acquire()
+        try:
+            status = self.__cmdr.send_cmd("OUTPUT 0")
+        finally:
+             self.lock.release()
+        if (status == 0):
+            self.dispay_disable()                    
 
     def set_on(self):
         v = self.leVoltage.text()
         ofst = self.leVoltageOfst.text()
         self.update_config(int(v), int(ofst))
         volt = int(v) - int(ofst)
+        status = 0
 
-        if self.__cmdr.get_status() == 0:
-            # close_connect(cmdr) 
-            self.__cmdr.close_connect()
-            self.centralWidget.setEnabled(False)
-            return
+        self.lock.acquire()
+        try:
+            status = self.__cmdr.get_status()
+        finally:
+            self.lock.release()
+
+        if (status == 0):
+            self.dispay_disable()
+            return            
 
         print('Voltage: ' + str(volt))
-        self.__cmdr.send_cmd("VOLTAGE " + str(volt))
-        self.__cmdr.send_cmd("CURRENT 1000")
-        self.__cmdr.send_cmd("OUTPUT 1")
-        # close_connect(cmdr)        
+        
+        self.lock.acquire()
+        try:        
+            status = self.__cmdr.send_cmd("VOLTAGE " + str(volt))
+            status = self.__cmdr.send_cmd("CURRENT 1000")
+            status = self.__cmdr.send_cmd("OUTPUT 1")
+        finally:
+            self.lock.release()
+
+        if (status == 0):
+            self.dispay_disable()            
+     
 
     def update_config(self, voltage, ofst):
         config = {
             "voltage": voltage,
             "voltage offset": ofst
         }
-        cfg = json.dumps(config, indent=4, sort_keys=True)
+        cfg = json.dumps(config, indent = 4, sort_keys = True)
         print(cfg)
         f = open("config.json", 'w')
         f.write(cfg)
