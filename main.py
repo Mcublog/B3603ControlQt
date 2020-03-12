@@ -17,7 +17,7 @@ from b3603_control import Control
 
 
 def close_connect(cmdr):
-    del cmdr      
+    del cmdr
 
 
 class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
@@ -33,12 +33,12 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         if self.__cmdr .get_status() != 0: # If the connection is sucsessfully
             self.__cmdr.close_connect()
 
-        menubar = self.menuBar 
+        menubar = self.menuBar
         self.connMenu = menubar.addMenu('&Connection') # Add menu to menu bar
 
         t = threading.Thread(target=self.port_scan)
         t.start()
-        
+
         # ports = list(list_ports.comports()) # return ListPortInfo
         # for port in ports:
         #     extractAction = QAction(port.device, self)
@@ -55,11 +55,11 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
             print("Config not found")
             self.update_config(5000, 0)
             with open("config.json", "r") as config_file:
-                config = json.load(config_file)            
+                config = json.load(config_file)
 
         self.leVoltage.setText(str(config['voltage']))
         self.leVoltageOfst.setText(str(config['voltage offset']))
-        
+
         # Slot connecting
         self.pbOff.clicked.connect(self.set_off)
         self.pbSet.clicked.connect(self.set_on)
@@ -69,8 +69,8 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         try:
             self.__cmdr.close_connect()
         finally:
-            self.lock.release()    
-        self.centralWidget().setEnabled(False)        
+            self.lock.release()
+        self.centralWidget().setEnabled(False)
 
     def port_scan(self):
         ports = []
@@ -90,7 +90,7 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
                     status = self.__cmdr.get_status()
                 finally:
                     self.lock.release()
-                if (status == 1):                    
+                if (status == 1):
                     port = ''
                     self.lock.acquire()
                     try:
@@ -102,8 +102,8 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
                         ports_num.append(dev.device)
                     if not (port in ports_num):
                         self.dispay_disable()
-            last_posts = ports    
-            time.sleep(0.5)    
+            last_posts = ports
+            time.sleep(0.5)
 
     def on_connect_clicked(self):
         action = self.sender()
@@ -114,18 +114,18 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
                 del self.__cmdr
             self.__cmdr = Control(action.text())  # /dev/ttyUSB0 for Linux
         finally:
-            self.lock.release()   
+            self.lock.release()
         # print(self.__cmdr.get_status())
         status = 0
         self.lock.acquire()
         try:
             status = self.__cmdr.get_status()
         finally:
-            self.lock.release()            
-        
+            self.lock.release()
+
         if (status == 0):
             self.dispay_disable()
-        else:        
+        else:
             self.centralWidget().setEnabled(True)
 
     def set_off(self):
@@ -136,7 +136,7 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         finally:
              self.lock.release()
         if (status == 0):
-            self.dispay_disable()                    
+            self.dispay_disable()
 
     def set_on(self):
         v = self.leVoltage.text()
@@ -153,12 +153,12 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
 
         if (status == 0):
             self.dispay_disable()
-            return            
+            return
 
         print('Voltage: ' + str(volt))
-        
+
         self.lock.acquire()
-        try:        
+        try:
             status = self.__cmdr.send_cmd("VOLTAGE " + str(volt))
             status = self.__cmdr.send_cmd("CURRENT 1000")
             status = self.__cmdr.send_cmd("OUTPUT 1")
@@ -166,8 +166,8 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
             self.lock.release()
 
         if (status == 0):
-            self.dispay_disable()            
-     
+            self.dispay_disable()
+
 
     def update_config(self, voltage, ofst):
         config = {
