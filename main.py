@@ -96,20 +96,8 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
                 status = 0
 
                 status = self.exuite_cmd(self.__cmdr.get_status)
-
-                # self.lock.acquire()
-                # try:
-                #     status = self.__cmdr.get_status()
-                # finally:
-                #     self.lock.release()
-
                 if (status == 1):
                     port = self.exuite_cmd(self.__cmdr.get_port)
-                    # self.lock.acquire()
-                    # try:
-                    #     port = self.__cmdr.get_port()
-                    # finally:
-                    #     self.lock.release()
                     ports_num = []
                     for dev in ports:
                         ports_num.append(dev.device)
