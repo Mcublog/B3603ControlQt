@@ -64,12 +64,21 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         self.pbOff.clicked.connect(self.set_off)
         self.pbSet.clicked.connect(self.set_on)
 
-    def dispay_disable(self):
+    def exuite_cmd(self, func, param = None):
+        ret = None
         self.lock.acquire()
         try:
-            self.__cmdr.close_connect()
+
+            if param != None:
+                ret = func(param)
+            else:
+                ret = func()
         finally:
             self.lock.release()
+        return ret
+
+    def dispay_disable(self):
+        self.exuite_cmd(self.__cmdr.close_connect)
         self.centralWidget().setEnabled(False)
 
     def port_scan(self):
@@ -85,18 +94,22 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
                     self.connMenu.addAction(extractAction)
                     print(port.device)
                 status = 0
-                self.lock.acquire()
-                try:
-                    status = self.__cmdr.get_status()
-                finally:
-                    self.lock.release()
+
+                status = self.exuite_cmd(self.__cmdr.get_status)
+
+                # self.lock.acquire()
+                # try:
+                #     status = self.__cmdr.get_status()
+                # finally:
+                #     self.lock.release()
+
                 if (status == 1):
-                    port = ''
-                    self.lock.acquire()
-                    try:
-                        port = self.__cmdr.get_port()
-                    finally:
-                        self.lock.release()
+                    port = self.exuite_cmd(self.__cmdr.get_port)
+                    # self.lock.acquire()
+                    # try:
+                    #     port = self.__cmdr.get_port()
+                    # finally:
+                    #     self.lock.release()
                     ports_num = []
                     for dev in ports:
                         ports_num.append(dev.device)
@@ -108,6 +121,7 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
     def on_connect_clicked(self):
         action = self.sender()
         print('Action: ' + action.text())
+
         self.lock.acquire()
         try:
             if (self.__cmdr != None):
@@ -115,26 +129,15 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
             self.__cmdr = Control(action.text())  # /dev/ttyUSB0 for Linux
         finally:
             self.lock.release()
-        # print(self.__cmdr.get_status())
-        status = 0
-        self.lock.acquire()
-        try:
-            status = self.__cmdr.get_status()
-        finally:
-            self.lock.release()
 
+        status = self.exuite_cmd(self.__cmdr.get_status)
         if (status == 0):
             self.dispay_disable()
         else:
             self.centralWidget().setEnabled(True)
 
     def set_off(self):
-        status = 0
-        self.lock.acquire()
-        try:
-            status = self.__cmdr.send_cmd("OUTPUT 0")
-        finally:
-             self.lock.release()
+        status = self.exuite_cmd(self.__cmdr.send_cmd, "OUTPUT 0")
         if (status == 0):
             self.dispay_disable()
 
@@ -143,27 +146,16 @@ class ExampleApp(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         ofst = self.leVoltageOfst.text()
         self.update_config(int(v), int(ofst))
         volt = int(v) - int(ofst)
-        status = 0
 
-        self.lock.acquire()
-        try:
-            status = self.__cmdr.get_status()
-        finally:
-            self.lock.release()
-
+        status = self.exuite_cmd(self.__cmdr.get_status)
         if (status == 0):
             self.dispay_disable()
             return
 
         print('Voltage: ' + str(volt))
-
-        self.lock.acquire()
-        try:
-            status = self.__cmdr.send_cmd("VOLTAGE " + str(volt))
-            status = self.__cmdr.send_cmd("CURRENT 1000")
-            status = self.__cmdr.send_cmd("OUTPUT 1")
-        finally:
-            self.lock.release()
+        status = self.exuite_cmd(self.__cmdr.send_cmd, "VOLTAGE " + str(volt))
+        status = self.exuite_cmd(self.__cmdr.send_cmd, "CURRENT 1000")
+        status = self.exuite_cmd(self.__cmdr.send_cmd, "OUTPUT 1")
 
         if (status == 0):
             self.dispay_disable()
